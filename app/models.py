@@ -19,3 +19,10 @@ class Config(Base):
     id = Column(Integer, primary_key=True, index=True)
     key = Column(String, unique=True, index=True)
     value = Column(Text)
+
+class AgentLog(Base):
+    __tablename__ = "agent_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    message = Column(Text)
+    level = Column(String, default="info")

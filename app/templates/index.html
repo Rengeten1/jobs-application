@@ -37,6 +37,20 @@
         </div>
     </div>
 
+    <!-- Live Agent Terminal -->
+    <div class="glass" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="margin-top: 0; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <span>Live Agent Terminal</span>
+            <span id="agentStatusPulse" class="dot"></span>
+        </h3>
+        <div id="terminalConsole" class="terminal">
+            <div class="log-entry log-info">
+                <span class="log-time">System</span>
+                <span class="log-msg">Waiting for agent connection...</span>
+            </div>
+        </div>
+    </div>
+
     <div class="glass" style="padding: 1.5rem;">
         <h3 style="margin-top: 0;">Recent Applications</h3>
         <table>
@@ -112,6 +126,53 @@
                 }
             }
         });
+        
+        // Live Terminal Logic
+        const terminal = document.getElementById('terminalConsole');
+        const statusPulse = document.getElementById('agentStatusPulse');
+
+        async function fetchLogs() {
+            try {
+                const response = await fetch('/api/logs');
+                const logs = await response.json();
+                
+                if(logs.length > 0) {
+                    terminal.innerHTML = '';
+                    logs.forEach(log => {
+                        const entry = document.createElement('div');
+                        entry.className = `log-entry log-${log.level}`;
+                        entry.innerHTML = `<span class="log-time">[${log.timestamp}]</span> <span class="log-msg">${log.message}</span>`;
+                        terminal.appendChild(entry);
+                    });
+                    terminal.scrollTop = terminal.scrollHeight;
+                }
+            } catch (error) {
+                console.error("Failed to fetch logs");
+            }
+        }
+
+        async function fetchStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const status = await response.json();
+                
+                const dot = document.querySelector('.dot.status-pulse-main');
+                if (status.running) {
+                    if (dot) dot.classList.add('active');
+                    statusPulse.classList.add('active');
+                } else {
+                    if (dot) dot.classList.remove('active');
+                    statusPulse.classList.remove('active');
+                }
+            } catch (error) {
+                console.error("Failed to fetch status");
+            }
+        }
+
+        setInterval(fetchLogs, 2000);
+        setInterval(fetchStatus, 3000);
+        fetchLogs();
+        fetchStatus();
     </script>
 </div>
 {% endblock %}

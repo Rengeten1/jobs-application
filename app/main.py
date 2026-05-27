@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
 from app.database import engine, Base, get_db
-from app.models import Job, Config
+from app.models import Job, Config, AgentLog
 from agent.orchestrator import orchestrator
 
 load_dotenv()
@@ -83,3 +83,13 @@ async def start_agent():
 async def stop_agent():
     await orchestrator.stop()
     return {"status": "stopped"}
+
+@app.get("/api/logs")
+async def get_logs(db: Session = Depends(get_db)):
+    logs = db.query(AgentLog).order_by(AgentLog.timestamp.desc()).limit(50).all()
+    logs.reverse()
+    return [{"timestamp": log.timestamp.strftime("%H:%M:%S"), "message": log.message, "level": log.level} for log in logs]
+
+@app.get("/api/status")
+async def get_status():
+    return {"running": orchestrator.running}

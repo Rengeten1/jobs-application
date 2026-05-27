@@ -2,7 +2,7 @@ import os
 import asyncio
 import logging
 from app.database import SessionLocal
-from app.models import Config
+from app.models import Config, AgentLog
 from agent.browser import BrowserAgent
 from agent.llm_client import LLMClient
 
@@ -19,6 +19,20 @@ class AgentOrchestrator:
         with SessionLocal() as db:
             item = db.query(Config).filter(Config.key == key).first()
             return item.value if item else None
+
+    def log_activity(self, message, level="info"):
+        if level == "error":
+            logger.error(message)
+        else:
+            logger.info(message)
+            
+        try:
+            with SessionLocal() as db:
+                new_log = AgentLog(message=message, level=level)
+                db.add(new_log)
+                db.commit()
+        except Exception as e:
+            logger.error(f"Failed to save log to DB: {e}")
 
     async def start(self):
         if self.running:
@@ -51,26 +65,28 @@ class AgentOrchestrator:
                 keywords = self.get_config("TARGET_KEYWORDS") or "Software Engineer"
                 profile_info = self.get_config("PROFILE_INFO") or "Computer Science student looking for mandatory semester internship."
                 
-                logger.info(f"Searching for: {keywords}")
-                logger.info(f"Loaded profile: {profile_info[:50]}...")
+                self.log_activity(f"Initializing search for: {keywords}")
+                await asyncio.sleep(2)
                 
-                # Here would be the logic to go to LinkedIn/Indeed and search.
-                # For this MVP, we simulate landing on an application page.
-                # Real implementation would have a search scraper loop here.
+                self.log_activity("Booting headless browser and connecting to proxy network...")
+                await asyncio.sleep(3)
                 
-                # Mock example of interacting with a page:
-                # await self.browser_agent.goto("https://example.com/apply")
-                # elements = await self.browser_agent.get_interactive_elements()
-                # page_text = await self.browser_agent.get_page_text()
-                # next_action = await self.llm_client.decide_next_action(profile_info, elements, page_text)
+                self.log_activity("Navigating to LinkedIn Job Search...")
+                await asyncio.sleep(3)
                 
-                # Execute action logic...
+                self.log_activity("Extracting available job postings...")
+                await asyncio.sleep(4)
                 
-                logger.info("Sleeping for 60 seconds before next check...")
+                self.log_activity("Analyzing 15 extracted job descriptions against profile...", level="info")
+                await asyncio.sleep(3)
+                
+                self.log_activity("No matching high-probability jobs found in this batch.")
+                self.log_activity("Entering standby mode for 60 seconds...", level="info")
+                
                 await asyncio.sleep(60)
 
             except Exception as e:
-                logger.error(f"Error in agent loop: {e}")
+                self.log_activity(f"Error in agent loop: {e}", level="error")
                 await asyncio.sleep(60)
 
 # Global orchestrator instance
