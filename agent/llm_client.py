@@ -1,4 +1,3 @@
-import os
 import json
 from openai import AsyncOpenAI
 from agent.prompts import SYSTEM_PROMPT_AGENT, COVER_LETTER_PROMPT

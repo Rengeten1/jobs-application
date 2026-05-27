@@ -1,5 +1,4 @@
 from playwright.async_api import async_playwright
-import asyncio
 
 class BrowserAgent:
     def __init__(self, headless=True):

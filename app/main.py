@@ -3,14 +3,13 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-import os
 from dotenv import load_dotenv
-
-load_dotenv()
 
 from app.database import engine, Base, get_db
 from app.models import Job, Config
 from agent.orchestrator import orchestrator
+
+load_dotenv()
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)

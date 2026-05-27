@@ -2,7 +2,7 @@ import os
 import asyncio
 import logging
 from app.database import SessionLocal
-from app.models import Config, Job
+from app.models import Config
 from agent.browser import BrowserAgent
 from agent.llm_client import LLMClient
 
@@ -52,6 +52,7 @@ class AgentOrchestrator:
                 profile_info = self.get_config("PROFILE_INFO") or "Computer Science student looking for mandatory semester internship."
                 
                 logger.info(f"Searching for: {keywords}")
+                logger.info(f"Loaded profile: {profile_info[:50]}...")
                 
                 # Here would be the logic to go to LinkedIn/Indeed and search.
                 # For this MVP, we simulate landing on an application page.
