@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoJobber - Autonomous Applications</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <aside class="glass">
+        <h1>AutoJobber</h1>
+        <nav>
+            <a href="/" class="{% if request.url.path == '/' %}active{% endif %}">Dashboard</a>
+            <a href="/config" class="{% if request.url.path == '/config' %}active{% endif %}">Configuration</a>
+        </nav>
+        <div style="margin-top: auto;">
+            <button id="start-btn" onclick="startAgent()" style="width: 100%; margin-bottom: 1rem;">Start Agent</button>
+            <button id="stop-btn" onclick="stopAgent()" style="width: 100%; background: var(--danger);">Stop Agent</button>
+        </div>
+    </aside>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        async function startAgent() {
+            await fetch('/api/start', {method: 'POST'});
+            alert('Agent started in background');
+        }
+        async function stopAgent() {
+            await fetch('/api/stop', {method: 'POST'});
+            alert('Agent stopped');
+        }
+    </script>
+</body>
+</html>

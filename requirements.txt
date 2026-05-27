@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+sqlalchemy
+playwright
+openai
+pydantic
+pydantic-settings
+python-dotenv

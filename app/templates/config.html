@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="header-controls">
+        <h2>Configuration</h2>
+    </div>
+
+    <div class="glass" style="padding: 2rem; max-width: 800px;">
+        <form action="/config" method="POST">
+            <div class="form-group">
+                <label for="target_keywords">Target Job Keywords & Locations</label>
+                <input type="text" id="target_keywords" name="target_keywords" value="{{ config.get('TARGET_KEYWORDS', '') }}" placeholder="e.g. Software Engineer Remote Internship">
+            </div>
+
+            <div class="form-group">
+                <label for="profile_info">Mandatory Semester Profile (Tell the AI about yourself, skills, and that this is for a mandatory semester)</label>
+                <textarea id="profile_info" name="profile_info" rows="8" placeholder="I am a CS student looking for a mandatory semester internship in Python... Use this info to answer ATS questions.">{{ config.get('PROFILE_INFO', '') }}</textarea>
+            </div>
+
+            <button type="submit">Save Configuration</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

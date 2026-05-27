@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="header-controls">
+        <h2>Dashboard</h2>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass stat-card">
+            <span class="label">Total Found</span>
+            <span class="value">{{ stats.total }}</span>
+        </div>
+        <div class="glass stat-card">
+            <span class="label">Successfully Applied</span>
+            <span class="value applied">{{ stats.applied }}</span>
+        </div>
+        <div class="glass stat-card">
+            <span class="label">Pending</span>
+            <span class="value pending">{{ stats.pending }}</span>
+        </div>
+        <div class="glass stat-card">
+            <span class="label">Failed</span>
+            <span class="value failed">{{ stats.failed }}</span>
+        </div>
+    </div>
+
+    <!-- Analytics Charts -->
+    <div class="stats-grid" style="grid-template-columns: 2fr 1fr; margin-bottom: 2rem;">
+        <div class="glass" style="padding: 1.5rem;">
+            <h3 style="margin-top: 0; margin-bottom: 1rem;">Applications Over Time</h3>
+            <div style="height: 250px;"><canvas id="lineChart"></canvas></div>
+        </div>
+        <div class="glass" style="padding: 1.5rem;">
+            <h3 style="margin-top: 0; margin-bottom: 1rem;">Status Distribution</h3>
+            <div style="height: 250px;"><canvas id="doughnutChart"></canvas></div>
+        </div>
+    </div>
+
+    <div class="glass" style="padding: 1.5rem;">
+        <h3 style="margin-top: 0;">Recent Applications</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Company</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>{{ job.applied_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ job.company }}</td>
+                    <td>{{ job.title }}</td>
+                    <td><span class="badge {{ job.status }}">{{ job.status }}</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-muted);">No jobs applied yet. Start the agent!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const chartData = {{ chart_data | tojson | safe }};
+        
+        // Line Chart
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: chartData.dates.length ? chartData.dates : ['Today'],
+                datasets: [{
+                    label: 'Jobs Applied',
+                    data: chartData.counts.length ? chartData.counts : [0],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                }
+            }
+        });
+
+        // Doughnut Chart
+        new Chart(document.getElementById('doughnutChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Applied', 'Failed', 'Pending'],
+                datasets: [{
+                    data: chartData.statuses,
+                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#f3f4f6' } }
+                }
+            }
+        });
+    </script>
+</div>
+{% endblock %}
