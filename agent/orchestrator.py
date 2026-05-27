@@ -69,8 +69,13 @@ class AgentOrchestrator:
     async def run_loop(self):
         try:
             # 1. Read config
-            keywords = self.get_config("TARGET_KEYWORDS") or "Software Engineer"
+            raw_keywords = self.get_config("TARGET_KEYWORDS") or "Software Engineer"
             profile_info = self.get_config("PROFILE_INFO") or "Computer Science student looking for mandatory semester internship."
+
+            # Simple heuristic: split by comma to separate keywords from locations
+            parts = [p.strip() for p in raw_keywords.split(",") if p.strip()]
+            keywords = parts[0] if parts else "Software Engineer"
+            locations = parts[-1] if len(parts) > 1 else ""
 
             # Initialize platform plugins
             platforms = [
@@ -88,7 +93,7 @@ class AgentOrchestrator:
                         
                     self.log_activity(f"--- Switching Context: {platform.name} ---")
                     try:
-                        await platform.process_platform(keywords, keywords) # Using keywords for locations temporarily unless loc is specified
+                        await platform.process_platform(keywords, locations)
                     except Exception as e:
                         self.log_activity(f"Error processing {platform.name}: {e}", level="error")
                     
