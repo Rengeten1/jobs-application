@@ -26,12 +26,17 @@
 
     <script>
         async function startAgent() {
-            await fetch('/api/start', {method: 'POST'});
-            alert('Agent started in background');
+            try {
+                const res = await fetch('/api/start', {method: 'POST'});
+                if(res.ok) alert('Agent startup initiated!');
+                else alert('Failed to contact server to start agent.');
+            } catch(e) { alert('Network error.'); }
         }
         async function stopAgent() {
-            await fetch('/api/stop', {method: 'POST'});
-            alert('Agent stopped');
+            try {
+                const res = await fetch('/api/stop', {method: 'POST'});
+                if(res.ok) alert('Agent stopped');
+            } catch(e) {}
         }
     </script>
 </body>

@@ -36,21 +36,26 @@ class AgentOrchestrator:
 
     async def start(self):
         if self.running:
+            self.log_activity("Agent is already running.", level="warning")
             return
         
         api_key = os.getenv("GITHUB_API_KEY")
-        if not api_key:
-            logger.error("No GitHub API key configured in .env.")
+        if not api_key or api_key == "your_github_api_key_here":
+            self.log_activity("Agent aborted: Invalid or missing GITHUB_API_KEY in .env.", level="error")
             return
 
-        self.llm_client = LLMClient(api_key)
-        self.browser_agent = BrowserAgent(headless=True)
-        await self.browser_agent.start()
-        self.running = True
-        
-        # Start the main loop in the background
-        asyncio.create_task(self.run_loop())
-        logger.info("Agent started successfully.")
+        self.log_activity("Initializing LLM and booting headless browser...")
+        try:
+            self.llm_client = LLMClient(api_key)
+            self.browser_agent = BrowserAgent(headless=True)
+            await self.browser_agent.start()
+            self.running = True
+            
+            # Start the main loop in the background
+            asyncio.create_task(self.run_loop())
+            self.log_activity("Agent started successfully.")
+        except Exception as e:
+            self.log_activity(f"Failed to boot browser or start agent: {e}", level="error")
 
     async def stop(self):
         self.running = False
