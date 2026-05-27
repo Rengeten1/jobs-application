@@ -40,7 +40,10 @@
     <!-- Live Agent Terminal -->
     <div class="glass" style="padding: 1.5rem; margin-bottom: 2rem;">
         <h3 style="margin-top: 0; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-            <span>Live Agent Terminal</span>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span>Live Agent Terminal</span>
+                <button onclick="copyLogs()" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary);">Copy Logs</button>
+            </div>
             <span id="agentStatusPulse" class="dot"></span>
         </h3>
         <div id="terminalConsole" class="terminal">
@@ -167,6 +170,22 @@
             } catch (error) {
                 console.error("Failed to fetch status");
             }
+        }
+
+        function copyLogs() {
+            const logEntries = document.querySelectorAll('#terminalConsole .log-entry');
+            let textToCopy = '';
+            logEntries.forEach(entry => {
+                const time = entry.querySelector('.log-time').innerText;
+                const msg = entry.querySelector('.log-msg').innerText;
+                textToCopy += `${time} ${msg}\n`;
+            });
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('Logs copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy logs. Note: Copying to clipboard may require HTTPS if not on localhost.');
+            });
         }
 
         setInterval(fetchLogs, 2000);
