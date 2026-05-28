@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 .env
 data/*.db
+data/browser_profile/
+debug_screenshot.png

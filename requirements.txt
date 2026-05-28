@@ -4,6 +4,7 @@ jinja2
 python-multipart
 sqlalchemy
 playwright
+playwright-stealth
 openai
 pydantic
 pydantic-settings
